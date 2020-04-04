@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	Book Details
+{% endblock %}
+
+{% block body %}
+	<h1 class="display-4">Book Details: {{book_details["title"]}}</h1>
+	<p>Title : {{book_details["title"]}}</p>
+	<p>ISBN : {{book_details["isbn"]}}</p>
+	<p>Author : {{book_details["author"]}}</p>
+	<p>Year : {{book_details["year"]}}</p>
+	<hr>
+	<p>Avg. Rating: {{book_details["average_rating"]}}</p>
+	<p>Ratings Count: {{book_details["ratings_count"]}}</p>
+	<p>Goodreads Avg. Rating: {{ goodreads_book_details["average_rating"] }}</p>
+	<p>Goodreads Ratings Count: {{ goodreads_book_details["ratings_count"] }}</p>
+
+	<h2>Fill the form to review the book</h2>
+	<form action='./{{book_details["book_id"]}}/review' method="POST">
+		<div class="form-group">
+			<label for="rating">Rating</label>
+			<select class="form-control" id="rating" name="rating">
+			  <option value="1">1</option>
+			  <option value="2">2</option>
+			  <option value="3">3</option>
+			  <option value="4">4</option>
+			  <option value="5">5</option>
+			</select>
+		</div>
+
+		<div class="form-group">
+			<label for="message">Message</label><br>
+			<textarea class="form-control" id="message" name="message" rows="10" placeholder="Write the review here"></textarea><br> 	
+		</div>
+		
+		<div class="form-group">
+			<button class="btn btn-primary" type="submit">Submit</button>
+		</div>
+		
+	</form>
+
+	<div>
+		<h2 class="h2">Reviews from others</h2>
+		{% for username, message, rating in reviews %}
+		<p>Rating: {{ rating }}</p>
+		<p>"{{ message }}" <span class="font-weight-bold font-italic">-{{ username }}</span></p>
+		{% endfor %}
+	</div>
+	
+{% endblock %}

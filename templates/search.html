@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	Search Books
+{% endblock %}
+
+{% block heading %}
+	
+{% endblock %}
+
+{% block body %}
+	<h1 class="display-4">Search Books</h1>
+	<form action="/search" method="POST">
+		<div class="form-group">
+			<label for="search"></label>
+			<input id="search" type="text" name="search" placeholder="Search Books Here">
+			<button>Submit</button>
+		</div>
+	</form>
+
+	{% if books %}
+	<h2 class="h2">Result</h2>
+	<table class="table">
+	<tr>
+		<th scope="col">No.</th>
+		<th scope="col">ISBN</th>
+		<th scope="col">Title</th>
+		<th scope="col">Author</th>
+		<th scope="col">Year</th>
+	</tr>
+	{% for book_id, isbn, title, author, year in books %}
+	<tr>
+		<td>{{ loop.index }}</td>
+		<td><a href="/book/{{ book_id }}">{{ isbn }}</a></td>
+		<td><a href="/book/{{ book_id }}">{{ title }}</a></td>
+		<td>{{ author }}</td>
+		<td>{{ year }}</td>
+	</tr>
+	{% endfor %}
+	</table>
+	{% endif %}
+{% endblock %}
