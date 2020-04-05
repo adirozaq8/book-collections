@@ -44,7 +44,8 @@ def register():
 				{"username": username, "password": password})
 			db.commit()
 		except:
-			return redirect(url_for('error_page'))
+			message = "Username already exist"
+			return render_template("error.html", message=message)
 		return redirect("/")
 
 @app.route("/login", methods=["POST", "GET"])
@@ -56,9 +57,11 @@ def login():
 		password = request.form.get("password")
 		user = db.execute("SELECT * FROM users WHERE username = :username AND password = :password",
 			{"username": username, "password": password}).fetchone()
-		print(user)
 		if user:
 			session["loggedin"] = {"id": user[0], "username": user[1]}
+		else:
+			message = "User does not exist / wrong password"
+			return render_template("error.html", message=message)
 		return redirect("/")
 
 @app.route("/search", methods=["POST", "GET"])
@@ -78,7 +81,8 @@ def search():
 @app.route("/book/<string:book_id>")
 def book_page(book_id):
 	if session["loggedin"] == None:
-		return redirect(url_for("error_page"))
+		message = "You must login to do that"
+		return render_template("error.html", message=message)
 	book = db.execute("SELECT * FROM books WHERE id = :id",
 			{"id": book_id}).fetchone()
 	book_ratings = db.execute("SELECT COUNT(*), ROUND(AVG(rating),1) FROM book_reviews WHERE book_id = :book_id",
@@ -103,8 +107,8 @@ def book_page(book_id):
 @app.route("/book/<string:book_id>/review", methods=["POST", "GET"])
 def book_review(book_id):
 	if session["loggedin"] == None:
-		return redirect(url_for("error_page"))
-
+		message = "You must login to do that"
+		return render_template("error.html", message=message)
 	if request.method == "POST":
 		message = request.form.get("message")
 		rating = request.form.get("rating")
@@ -118,14 +122,18 @@ def book_review(book_id):
 			db.execute("INSERT INTO book_reviews (book_id, user_id, message, rating) VALUES (:book_id, :user_id, :message, :rating)",
 				{"book_id": book_id, "user_id": user, "message": message, "rating": rating})
 			db.commit()
+		except Exception as e:
+			return render_template("error.html", message=e)
 		except:
-			return redirect(url_for('error_page'))
+			message = "Something went wrong"
+			return render_template("error.html", message=message)
 	return redirect("/book/"+book_id)
 
 @app.route("/api/<string:isbn>")
 def get_api(isbn):
 	if session["loggedin"] == None:
-		return redirect(url_for("error_page"))
+		message = "You must login to do that"
+		return render_template("error_page", message=message)
 
 	book = db.execute("SELECT * FROM books WHERE isbn = :isbn",
 			{"isbn": isbn}).fetchone()
@@ -142,7 +150,6 @@ def get_api(isbn):
 					}
 	return json.dumps(book_details)
 
-@app.route
 @app.route("/logout")
 def logout():
 	session["loggedin"] = None
